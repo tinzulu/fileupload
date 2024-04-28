@@ -1,0 +1,27 @@
+version: '3.9'
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.5
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: W@lter2019!
+      KEYCLOAK_LOGLEVEL: INFO
+      ROOT_LOGLEVEL: INFO
+    ports:
+      - "9004:8080"
+      - "8788:8787"
+    command:
+      - start-dev
+      - --features admin-fine-grained-authz
+
+  upload-server:
+    image: uploadserver:latest
+    environment:
+      KEYCLOAK_REALM: fileupload
+      KEYCLOAK_CLIENT: fileupload-client
+      KEYCLOAK_URL: http://keycloak:9004
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./data/:/app/uploads
+    

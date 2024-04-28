@@ -1,16 +1,26 @@
 const express = require('express');
 const app = express();
-const port = 5000;
+const dotenv = require('dotenv').config();
+const uploadRoute = require('#routes/main');
+const keycloak = require('./middleware/keyacloak')
 
-// Require the upload middleware
-const upload = require('./upload');
+const port = process.env.PORT;
 
-// Set up a route for file uploads
-app.post('/upload', upload.single('file'), (req, res) => {
-  // Handle the uploaded file
-  res.json({ message: 'File uploaded successfully!' });
-});
+//getting identity server configs
+const server = process.env.KEYCLOAK_URL;
+
+const errorHandler = (error, req, res, next) => {
+  const status = error.status || 422;
+  res.status(status).send(error.message);
+}
+
+// Register routes
+app.use(keycloak.middleware());
+app.use('/api/v1', uploadRoute);
+app.use(errorHandler);
+
 
 app.listen(port, () => {
-    console.log('Server is running on port ${port}');
+    console.log('Server is running on port '+ port );
+    console.log('identity server at '+ server)
 })

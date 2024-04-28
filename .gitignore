@@ -27,3 +27,5 @@ data
 *.sln
 *.sw?
 
+.package-lock.json
+
